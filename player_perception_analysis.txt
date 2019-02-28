@@ -1,0 +1,516 @@
+#include<iostream>
+#include<conio.h>
+#include<string>
+#include<cstring>
+#include<fstream>
+
+using namespace std;
+
+//Linklist node structure
+struct node
+{
+	node * child[26];//26 pointers for pointing from a to z
+	bool tag;// terminating tag of word
+	node()//node constructor
+	{
+		for(int i=0;i<26;i++)
+		{
+			child[i]=NULL;//initializes all 26 pointers to NULL
+
+		}
+		tag = false;//initializes terminating tag to false
+	}
+};
+struct str
+{
+	string op_st;
+	bool used_status;
+	str()
+	{
+		used_status = false;
+	}
+};
+
+//Linklist based Tree Class
+class Tree
+{
+private:
+	node * root;//points towards root node
+	node * curr;//points used for traversal
+public:
+	//class constructor
+	Tree()
+	{
+		root =  NULL;//initializes root to NULL
+		curr = 	NULL;//initializes curr to NULL
+	}
+
+	//method for inserting new word in Tree
+	void insert(string name)
+	{
+		int temp=0,i=0;
+		curr = root;
+
+		while(i<name.length())//loop iterations equals length of word
+		{
+
+			temp = name[i];
+
+			temp = temp - 97;
+
+			if(temp>= 0 && temp <=25)
+			{
+				if( i == 0 && (curr != NULL ))
+				{
+					//1st time bytch
+				}
+				else if( i != 0 && (curr->child[temp] != NULL ))
+				{
+					curr = curr->child[temp];	
+				}
+
+				else
+				{
+					node * q = new node();
+					if(root == NULL)
+					{
+						root = q;
+						curr = q;
+					}
+					else
+					{
+						curr->child[temp] = q;
+						curr = q;
+					}
+				}
+			}
+
+			else
+			{
+				return;
+			}
+			++i;
+		}
+		curr->tag = true;
+
+	}
+
+	//Searches the name 
+	bool search(string name)
+	{
+		int temp,i=1;
+		curr = root;
+
+		while(i < name.length())
+		{
+			temp = name[i];
+			temp = temp - 97;
+			//cout<<temp<<endl;
+			if((temp<0|| temp>25))
+			{
+				return false;
+			}
+			if(curr->child[temp] == NULL )
+			{
+				return false;
+			}
+
+			curr = curr->child[temp];
+			i++;
+		}
+		if( i == name.length())
+		{
+			return curr->tag;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	//returns true if tree is empty else returns false
+	bool isempty()
+	{
+		if(root == NULL)
+		{
+			return true;
+		}
+		return false;
+	}
+};
+struct node1
+{
+	string num;
+	node1 * next;
+	node1()
+	{
+		next=NULL;
+	}
+};
+
+class Stack{
+	node1 * top;
+	node1 * trav;
+public:
+	Stack()
+	{
+		top = trav=NULL;
+	}
+	void Push(string num1)
+	{
+		node1 * temp = new node1;
+		temp->num = num1;
+		temp->next = top;
+		top = temp;
+	}
+	void enque(string num1)
+	{
+		node1 * temp = new node1;
+		trav=top;
+		temp->num = num1;
+		temp->next=NULL;
+		if(top==NULL)
+		{
+			top=trav=temp;
+		}
+		else
+		{
+			while(trav->next != NULL)
+			{
+				trav = trav->next;
+			}
+		}
+		trav->next = temp;
+		trav=temp;
+	}
+	string Pop()
+	{
+		if (top != NULL)
+		{
+			node1 * temp = top;
+			top = top->next;
+			return temp->num;
+		}
+	}
+	bool isempty()
+	{
+		if( top == NULL)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	void display()
+	{
+		node1 * temp = top;
+		while (temp != NULL)
+		{
+			cout << temp->num << endl;
+			temp = temp->next;
+		}
+	}
+};
+class Que
+{
+
+	node1 * rear;
+	node1 * head;
+public:
+	Que()
+	{
+		head = NULL;
+		rear = NULL;
+	}
+
+	void enque(string num1)
+	{
+		node1* temp = new node1;
+		temp->num = num1;
+		temp->next = NULL;
+		if (rear == NULL)
+		{
+			rear = temp;
+			head = temp;
+		}
+		else
+		{
+			head->next = temp;
+			head = temp;
+		}
+	}
+	string deque()
+	{
+		if (rear != NULL)
+		{
+			node1* temp = rear;
+			rear = rear->next;
+			return temp->num;
+		}
+	}
+	bool isempty()
+	{
+		if( rear == NULL)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	void display()
+	{
+		node1* temp = rear;
+		while (temp != NULL)
+		{
+			cout << temp->num << endl;
+			temp = temp->next;
+		}
+	}
+};
+
+
+//reads and returns a word from the file
+string return_word(ifstream &file)
+{
+	string str;
+	file >> str;
+
+	return str;
+}
+
+//returns the number of node to be added
+int returns_ascii(string temp)
+{
+	int ascii;
+
+	ascii = int(temp[0]);
+	ascii = ascii - 97;
+
+	return ascii;
+}
+
+//adds node to tree structure
+void add_node(ifstream &file,Tree * lib)
+{
+	string temp;
+	int asc;
+	if (!file)
+	{
+		cout<<"File are missing."<<endl;
+		return ;
+	}
+	while(!file.eof())
+	{
+		temp = return_word(file);
+		asc = returns_ascii(temp);
+		lib[asc].insert(temp);
+	}
+}
+
+//computes and displays the result
+
+float Opinion_sentences_modified(Tree * postv,Tree * negtv)
+{
+	string temp,date,player;
+	int asc,pos =0,neg = 0,check =0;
+	Que frwd,nouns;
+	Stack Bkwrd;
+	float score=0,product=0,wtg=0;
+
+	int adj_count=0,noun_count=0;
+	string p_w,d_w,t_p,t_d,t_t;
+
+	//cout<<"Enter Date"<<endl;
+	//cin>>date;
+	date="1-1-15";
+	player="bale";
+	//cout<<"Enter Name of Player"<<endl;
+	//cin>>player;
+
+	//cout<<"Name \t\t Positive \t\t Negative \t Score "<<endl<<endl;
+
+	temp = "Files/"+date+"/"+player+".txt";
+
+	ifstream file5(temp);
+	if(!file5)
+	{
+		cout<<"file doesnot exist"<<endl;
+		getch();
+		return 0;
+	}
+	else 
+	{
+		cout<<"file exist"<<endl;
+		getch();
+	}
+
+
+
+	while(!file5.eof())// loop until end of file
+	{
+		t_t=temp;
+		//cout<<"IN file eof"<<endl;
+		temp = return_word(file5);
+		//cout<<temp<<" ";
+		frwd.enque(temp);
+		Bkwrd.Push(temp);
+		if(temp==".")
+		{
+			
+			//cout<<"in dot if"<<endl;
+			if(adj_count==0 || noun_count==0 )
+			{
+				//cout<<"none"<<endl;
+				//cout<<adj_count<<endl;
+				//cout<<noun_count<<endl;
+			}
+			else 
+			{
+			//	cout<<"in else"<<endl;
+				while(!nouns.isempty())
+				{
+					//			cout<<"outer while"<<endl;
+					temp=nouns.deque();
+
+					while(p_w != temp && d_w != temp)
+					{
+						//	cout<<"in while"<<endl;
+						if(p_w != temp && d_w != temp)
+						{
+							//			cout<<"not equal"<<endl;
+							p_w=Bkwrd.Pop();
+							d_w=frwd.deque();
+							Bkwrd.enque(p_w);
+							frwd.enque(d_w);
+						}
+						else if(p_w == temp && d_w !=temp)
+						{
+							//		cout<<"one equal"<<endl;
+							d_w=frwd.deque();
+							frwd.enque(d_w);
+						}
+						else if(p_w != temp && d_w ==temp)
+						{
+							//	cout<<"one equal"<<endl;
+							p_w=Bkwrd.Pop();
+							Bkwrd.enque(p_w);
+						}
+						else if(p_w== temp && d_w == temp)
+						{
+							cout<<"one equal"<<endl;
+						}
+					}
+					do
+					{
+						t_p=p_w;
+						t_d=d_w;
+						p_w=Bkwrd.Pop();
+						d_w=frwd.deque();
+						Bkwrd.enque(p_w);
+						frwd.enque(d_w);
+
+						if(p_w=="/JJ" || p_w=="/JJR" || p_w=="/JJS")
+						{
+							asc = returns_ascii(t_p);
+
+							if(asc >=0 && asc< 26)
+							{
+								if(!postv[asc].isempty() && postv[asc].search(t_p)== true)
+								{
+									score = 1;
+									wtg = wtg - 0.1;
+									score += (score * wtg);
+								}
+								else if(!negtv[asc].isempty() && negtv[asc].search(t_p)== true)
+								{
+									score = -1;
+									wtg = wtg - 0.1;
+									score += (score * wtg);
+								}
+							}
+						}
+						else if (d_w=="/JJ" || d_w=="/JJR" || d_w=="/JJS")
+						{
+							asc = returns_ascii(t_d);
+
+							if(asc >=0 && asc< 26)
+							{
+								if(!postv[asc].isempty() && postv[asc].search(t_d)== true)
+								{
+									score = 1;
+									wtg = wtg - 0.1;
+									score += (score * wtg);
+								}
+								else if(!negtv[asc].isempty() && negtv[asc].search(t_d)== true)
+								{
+									score = -1;
+									wtg = wtg - 0.1;
+									score += (score * wtg);
+								}
+							}
+						}
+					}while (p_w!="." && d_w!=".");
+				}
+			}
+			while(!Bkwrd.isempty())
+				{
+					Bkwrd.Pop();
+				}
+				while(!frwd.isempty())
+				{
+					frwd.deque();
+				}
+				while(!nouns.isempty())
+				{
+					nouns.deque();
+				}
+			noun_count=adj_count=0;
+			p_w=d_w=t_p=t_d=temp="";
+		}
+		else if(temp=="/NN"||temp=="/NNS"||temp=="/NNP"||temp=="/NP"||temp=="/NNPS")
+		{
+			//cout<<t_t<<endl;
+			nouns.enque(t_t);
+			++noun_count;
+			t_t=temp;
+			//cout<<noun_count<<endl;
+		}
+		else if(temp=="/JJ" || temp=="/JJR" || temp=="/JJS")
+		{
+			//cout<<t_t<<endl;
+			++adj_count;
+			t_t=temp;
+			//cout<<adj_count<<endl;
+		}
+	}
+	return score;
+}
+
+int main(void)
+{
+	Tree postv[26],negtv[26];//A for positive and B for negative
+	float score=0;
+
+	string names[30]={"aguero","bale","coutinho","falcao","flamini","gaal","gerrard","hazard","ibrahimovic","iniesta","klopp","matic","mourinho",
+		"mertesacker","nasri","neuer","ozil","ramsey","reus","rooney","ronaldo","skrtel","torres","xavi"};
+
+	ifstream file1("positive.txt");
+	ifstream file2("negative.txt");
+
+	//adds positive words to positive word Tree
+	add_node(file1,postv);
+	//adds negative words to negative word Tree
+	add_node(file2,negtv);
+	//cout<<" display loop"<<endl;
+	//display_result(postv,negtv,names);
+	score=Opinion_sentences_modified(postv, negtv);
+
+	cout<<score<<endl;
+
+	getch();
+	return 0;
+}
